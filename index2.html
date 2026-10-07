@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fractal Batik Generator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Fractal Batik Generator</h1>
+  <h2>Visualisasi Motif Batik Berbasis Fraktal dan Rekursi</h2>
+  <p>Fraktal adalah bentuk yang memiliki kemiripan diri (self-similarity): bagian kecilnya menyerupai keseluruhan. Batik Indonesia juga tersusun dari pengulangan ornamen geometris. Di sini keduanya dipertemukan: motif digambar secara matematis dengan rekursi, dan parameternya dapat Anda ubah langsung.</p>
+</header>
+
+<div class="layout">
+  <aside class="panel">
+    <h3>Panel Kontrol</h3>
+    <div class="ctrl"><label for="motif">Jenis Motif</label>
+      <select id="motif">
+        <option value="kawung">Kawung Fraktal</option>
+        <option value="flower">Bunga Fraktal</option>
+        <option value="spiral">Spiral Batik</option>
+      </select></div>
+    <div class="ctrl"><label for="iter">Jumlah Iterasi <span class="val"></span></label><input type="range" id="iter" min="1" max="8" step="1"></div>
+    <div class="ctrl"><label for="scale">Skala / Rasio Ukuran <span class="val"></span></label><input type="range" id="scale" min="0.3" max="0.9" step="0.01"></div>
+    <div class="ctrl"><label for="angle">Sudut Percabangan (°) <span class="val"></span></label><input type="range" id="angle" min="0" max="180" step="1"></div>
+    <div class="ctrl"><label for="branch">Jumlah Cabang</label>
+      <select id="branch"><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div>
+    <div class="ctrl"><label for="size">Ukuran Motif <span class="val"></span></label><input type="range" id="size" min="20" max="150" step="1"></div>
+    <div class="ctrl"><label for="spacing">Jarak Antar Motif <span class="val"></span></label><input type="range" id="spacing" min="60" max="300" step="2"></div>
+    <div class="ctrl"><label for="rot">Rotasi Motif (°) <span class="val"></span></label><input type="range" id="rot" min="0" max="360" step="1"></div>
+    <div class="ctrl"><label for="lw">Ketebalan Garis <span class="val"></span></label><input type="range" id="lw" min="1" max="10" step="1"></div>
+    <div class="ctrl"><label for="mode">Mode Tampilan</label>
+      <select id="mode"><option value="outline">Outline</option><option value="filled">Filled</option><option value="combo">Kombinasi</option></select></div>
+    <div class="colors">
+      <div><label for="bg">Latar</label><input type="color" id="bg"></div>
+      <div><label for="c1">Utama</label><input type="color" id="c1"></div>
+      <div><label for="c2">Sekunder</label><input type="color" id="c2"></div>
+    </div>
+    <div class="btns">
+      <button id="btnGen">Generate Motif</button><button id="btnRand" class="alt">Random Motif</button>
+      <button id="btnReset">Reset</button><button id="btnDl" class="alt">Download PNG</button>
+      <button id="btnStart">Start Animation</button><button id="btnStop" class="alt">Stop Animation</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="canvasbox">
+      <canvas id="canvas" width="900" height="650"></canvas>
+      <p id="note"></p>
+    </div>
+    <div class="cards">
+      <div class="card"><small>Jenis Motif</small><b id="iM"></b></div>
+      <div class="card"><small>Iterasi</small><b id="iI"></b></div>
+      <div class="card"><small>Rasio</small><b id="iS"></b></div>
+      <div class="card"><small>Sudut</small><b id="iA"></b></div>
+      <div class="card"><small>Jumlah Cabang</small><b id="iB"></b></div>
+      <div class="card"><small>Rotasi</small><b id="iR"></b></div>
+      <div class="card"><small>Ukuran</small><b id="iZ"></b></div>
+    </div>
+
+    <section class="info">
+      <h3>Konsep Matematika yang Digunakan</h3>
+      <div class="grid">
+        <div><b>Rekursi</b> – fungsi yang memanggil dirinya sendiri dengan ukuran lebih kecil.</div>
+        <div><b>Iterasi</b> – jumlah tahap pengulangan; semakin besar, semakin detail.</div>
+        <div><b>Transformasi geometri</b> – perubahan posisi, ukuran, dan arah bangun.</div>
+        <div><b>Self-similarity</b> – bagian motif menyerupai motif keseluruhan.</div>
+        <div><b>Skala</b> – pengali ukuran motif anak terhadap motif induk.</div>
+        <div><b>Rotasi</b> – perputaran motif terhadap titik pusat dengan sudut tertentu.</div>
+        <div><b>Translasi</b> – pergeseran motif ke posisi baru tanpa mengubah bentuk.</div>
+        <div><b>Fraktal</b> – bentuk dengan detail tak terbatas pada setiap perbesaran.</div>
+        <div><b>Dimensi fraktal</b> – ukuran kekompleksan pola; bisa bernilai pecahan.</div>
+      </div>
+      <div class="formula">D = <span class="frac"><span>log N</span><span>log(1/r)</span></span></div>
+      <p><b>D</b> = dimensi fraktal, <b>N</b> = jumlah bagian yang menyerupai objek awal, <b>r</b> = faktor skala. Contoh: segitiga Sierpinski memiliki N = 3 dan r = 1/2, sehingga D = log 3 / log 2 ≈ 1,585.</p>
+    </section>
+
+    <section class="info">
+      <h3>Proses Pembentukan Motif</h3>
+      <ol>
+        <li>Program menggambar motif utama.</li>
+        <li>Motif utama menentukan titik cabang.</li>
+        <li>Pada setiap titik cabang dipanggil fungsi yang sama.</li>
+        <li>Ukuran motif diperkecil menggunakan nilai rasio.</li>
+        <li>Iterasi dikurangi satu.</li>
+        <li>Proses terus berulang sampai iterasi bernilai nol.</li>
+      </ol>
+    </section>
+  </main>
+</div>
+<footer>Fractal Batik Generator · HTML5 Canvas, CSS, dan JavaScript murni</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
